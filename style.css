@@ -1,0 +1,11 @@
+.allbtns{
+    display: grid;
+    grid-template-columns: repeat(4,75px);
+    grid-template-areas:
+        "display display display display"
+        "seven eight nine add"
+        "four five six subtract"
+        "one two three multiply"
+        "zero decimal operate divide"
+        "clear clear . .";
+}
