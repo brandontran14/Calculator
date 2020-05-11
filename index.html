@@ -10,6 +10,7 @@
     <h1>Ti-84 Silver</h1>
     <div id="calculator" class="allbtns">
         <input type="text" name="display" id="display" style="grid-area: display" disabled>
+        <!--Numbers-->
         <button id="9" value="9" class="number" style="grid-area:nine">9</button>
         <button id="8" value="8" class="number" style="grid-area:eight">8</button>
         <button id="7" value="7" class="number" style="grid-area:seven">7</button>
@@ -20,14 +21,16 @@
         <button id="2" value="2" class="number" style="grid-area:two">2</button>
         <button id="1" value="1" class="number" style="grid-area:one">1</button>
         <button id="0" value="0" class="number" style="grid-area:zero">0</button>
+        <!--Operations-->
         <button id="+" value="+" class="operations" style="grid-area:add">+</button>
         <button id="-" value="-" class="operations" style="grid-area:subtract">-</button>
         <button id="*" value="*" class="operations"style="grid-area:multiply">x</button>
         <button id="/" value="/" class="operations" style="grid-area:divide">/</button>
         <button id="operate" value="=" style="grid-area:operate">=</button>
         <button id="clear" style="grid-area:clear">clear</button>
-        <button id="decimal" style="grid-area:decimal" value=".">.</button>
+        <button id="backspace" value ="" style="grid-area: backspace">backspace</button>
     </div>
+    <button id="decimal" class = "number" style="grid-area:decimal" value=".">.</button>
 </body>
 <!-- JS source-->
 <script type="text/javascript" src="calculator.js"></script>
