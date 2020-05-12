@@ -1,27 +1,21 @@
 //global constants
-const calcchoices = Array.from(document.querySelectorAll(".allbtns"));
+const calcchoices = Array.from(document.querySelectorAll(".allbtns .number"));
 const decimalbtn = document.querySelector("#decimal");
 var inputs = [];
 let numholder = "";
 let secondnum = "";
 let operation = "";
+decimalAllowed = true;
 
 //operation function with built in operations
 function operate(a,b,operator){
     switch(true){
-        case (operator == "+"): {
-            return a+b;
-        }
-        case (operator == "-"): {
-            return a-b;
-        }
-        case (operator == "*"): {
-            return a*b;
-        }
+        case (operator == "+"): return a+b;
+        case (operator == "-"): return a-b;
+        case (operator == "*"): return a*b;
         case (operator == "/"): {
             if(b == 0){
-                document.getElementById("display").value = "Math Error";
-                return document.getElementById("display").value
+                return document.getElementById("display").value = "Math Error";
             }
             return a/b;
         }
@@ -65,51 +59,49 @@ function parser(array){
 
 
 function buttonpressing(e){
-    document.getElementById("display").value += e.target.value //updates the display with what you pressed
+    document.getElementById("display").value += this.value; //updates the display with what you pressed
     //if number pressed
-    if(e.target.className === "number"){
-        numholder += e.target.textContent;
-    }
+    if(this.className === "number") numholder += this.textContent;
     //if decimal is pressed, make sure you cant press it again
-    if(e.target.id === "decimal"){
-        //while operations or clear is not pressed
-        console.log(e.target)
-        decimalbtn.removeEventListener("click", buttonpressing);
-    }
+    if(this.id === "decimal") this.removeEventListener("click", buttonpressing);
+
     //if an operation is pressed, push it onto the array and wait for another number to be inputted
-    if(e.target.className === "operations"){
-            operation = e.target.value;
-            inputs.push(Number(numholder))
-            inputs.push(operation)
+    if(this.className === "number operations"){
+            if(numholder != '') inputs.push(Number(numholder));
+            inputs.push(this.value)
             numholder = '';
-            decimalbtn.addEventListener("click",buttonpressing)
+            decimalbtn.addEventListener("click",buttonpressing);
         }
-    //if a = is encountered, push the number inputted and call parser function
-    if(e.target.value == "="){
-        //if(//nonumber of operations return error)
-        inputs.push(Number(numholder))
+
+    //if = is encountered, push the number inputted and call parser function
+    if(this.value == "=" && (inputs.includes("+")|| inputs.includes("-")|| inputs.includes("*")|| inputs.includes("/"))){
+        if(numholder != '') inputs.push(Number(numholder));
+//remember to check for logic(entering = before anything)
+        if(inputs.length < 3)  {
+            document.getElementById("display").value = "Math Error";
+        }
         numholder = '';
         document.getElementById("display").value = parser(inputs);
-        decimalbtn.addEventListener("click",buttonpressing)
+        decimalbtn.addEventListener("click",buttonpressing);
+    }
+//if backspace is encountered
+    if(this.textContent == "backspace"){
+        temp = document.getElementById("display").value;
+        tempnum = numholder;
+        document.getElementById("display").value = temp.substr(0, temp.length - 1);
+        numholder = tempnum.substr(0,tempnum.length-1);
+        decimalbtn.addEventListener("click",buttonpressing);
     }
 
     //if clear is pressed, clear everything
-    if(e.target.textContent == "clear") {
-       document.getElementById("display").value = '';
+    if(this.textContent == "clear") {
+        document.getElementById("display").value = '';
         inputs = [];
         numholder = '';
-        decimalbtn.addEventListener("click",buttonpressing)
+        decimalbtn.addEventListener("click",buttonpressing);
     }
+    console.log(numholder)
+    console.log(inputs)
 }
-decimalbtn.addEventListener("click",buttonpressing)
 calcchoices.forEach(choice => choice.addEventListener("click", buttonpressing))
 
-
-    // if(e.target.textContent == "backspace"){
-    //     inputs.push(Number(numholder))
-    //     numbholder ='';
-    //     inputs.pop();
-    //     temp = document.getElementById("display").value;
-    //     document.getElementById("display").value = temp.substr(0, temp.length - 1);
-    //     console.log(inputs)
-    // }
