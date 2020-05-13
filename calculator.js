@@ -1,11 +1,11 @@
 //global constants
 const calcchoices = Array.from(document.querySelectorAll(".allbtns .number"));
+const buttonchoices = Array.from(document.querySelectorAll("button[data-key]"));
 const decimalbtn = document.querySelector("#decimal");
 var inputs = [];
 let numholder = "";
 let secondnum = "";
 let operation = "";
-decimalAllowed = true;
 
 //operation function with built in operations
 function operate(a,b,operator){
@@ -22,16 +22,17 @@ function operate(a,b,operator){
     }
 }
 
-//function that backspaces
-function backspace(array){
-    array.pop();
-    return array;
-}
-
 //function to analyze the array of nums and operands
 function parser(array){
     newparsed = [];
     computednum = 0;
+    //consider parsing negatives first
+    for(i=0;i<array.length;i++){
+        if(array[i] === "-" && (array[i-1] == null || (array[i-1] === "+" || array[i-1] === "-" || array[i-1] === "*" || array[i-1] === "/"))) {
+            computednum = operate(0,array[i+1],array[i])
+            array.splice(i,2,computednum);
+        }
+    }
     //do multiplication and division first, and splice the array
     while(array.includes("*") || array.includes("/")){
         for(i=0; i<array.length; i++){
@@ -51,17 +52,14 @@ function parser(array){
             }
         }
     }
-    console.log(array);
     return array;
-
-
 }
-
-
 function buttonpressing(e){
-    document.getElementById("display").value += this.value; //updates the display with what you pressed
     //if number pressed
-    if(this.className === "number") numholder += this.textContent;
+    if(this.className === "number") {
+        numholder += this.textContent;
+        document.getElementById("display").value += this.value;
+    }
     //if decimal is pressed, make sure you cant press it again
     if(this.id === "decimal") this.removeEventListener("click", buttonpressing);
 
@@ -70,13 +68,13 @@ function buttonpressing(e){
             if(numholder != '') inputs.push(Number(numholder));
             inputs.push(this.value)
             numholder = '';
+            document.getElementById("display").value += this.textContent;
             decimalbtn.addEventListener("click",buttonpressing);
         }
 
     //if = is encountered, push the number inputted and call parser function
-    if(this.value == "=" && (inputs.includes("+")|| inputs.includes("-")|| inputs.includes("*")|| inputs.includes("/"))){
+    if(this.className == "number operate" && (inputs.includes("+")|| inputs.includes("-")|| inputs.includes("*")|| inputs.includes("/"))){
         if(numholder != '') inputs.push(Number(numholder));
-//remember to check for logic(entering = before anything)
         if(inputs.length < 3)  {
             document.getElementById("display").value = "Math Error";
         }
@@ -85,23 +83,29 @@ function buttonpressing(e){
         decimalbtn.addEventListener("click",buttonpressing);
     }
 //if backspace is encountered
-    if(this.textContent == "backspace"){
+    if(this.className == "number backspace"){
+        if(numholder == '' && (inputs[inputs.length-1] == '+' || inputs[inputs.length-1] == '-' || inputs[inputs.length-1] == '*' || inputs[inputs.length-1] == '/')){
+            inputs.pop();
+        }
         temp = document.getElementById("display").value;
         tempnum = numholder;
         document.getElementById("display").value = temp.substr(0, temp.length - 1);
         numholder = tempnum.substr(0,tempnum.length-1);
         decimalbtn.addEventListener("click",buttonpressing);
     }
-
     //if clear is pressed, clear everything
-    if(this.textContent == "clear") {
+    if(this.className == "number clear") {
         document.getElementById("display").value = '';
         inputs = [];
         numholder = '';
         decimalbtn.addEventListener("click",buttonpressing);
     }
-    console.log(numholder)
-    console.log(inputs)
 }
+
+
 calcchoices.forEach(choice => choice.addEventListener("click", buttonpressing))
+
+// window.addEventListener("keydown", function(e){
+//     const key = document.querySelector(`button[data-key="${e.keyCode}"]`);
+// })
 
