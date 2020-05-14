@@ -6,7 +6,8 @@ var inputs = [];
 let numholder = "";
 let secondnum = "";
 let operation = "";
-let pressedbutton = {};
+let decimalallowed = true;
+let pressed = false;
 
 //operation function with built in operations
 function operate(a,b,operator){
@@ -56,36 +57,48 @@ function parser(array){
     return array;
 }
 
+function decimalpressed(beenpressed){
+    decimalallowed = (beenpressed)? false : true
+}
+
 function buttonpressing(e){
+    e.classList.add("playing");
     //if number pressed
-    if(e.className === "number") {
+    if(e.classList.contains("numbers")) {
         numholder += e.value;
         document.getElementById("display").value += e.value;
     }
     //if decimal is pressed, make sure you cant press it again
-    if(e.className === "decimal") e.removeEventListener("click", buttonpressing);
+    if(e.classList.contains("decimal") && (decimalallowed == true)) {
+        pressed = true;
+        decimalpressed(pressed);
+        numholder += e.value;
+        document.getElementById("display").value += e.value;
+    }
 
     //if an operation is pressed, push it onto the array and wait for another number to be inputted
-    if(e.className === "number operations"){
+    if(e.classList.contains("operations")){
             if(numholder != '') inputs.push(Number(numholder));
             inputs.push(e.value)
             numholder = '';
             document.getElementById("display").value += e.textContent;
-            decimalbtn.addEventListener("click",buttonpressing);
+            pressed = false;
+            decimalpressed(pressed);
         }
 
     //if = is encountered, push the number inputted and call parser function
-    if(e.className == "number operate" && (inputs.includes("+")|| inputs.includes("-")|| inputs.includes("*")|| inputs.includes("/"))){
+    if(e.classList.contains("operate") && (inputs.includes("+")|| inputs.includes("-")|| inputs.includes("*")|| inputs.includes("/"))){
         if(numholder != '') inputs.push(Number(numholder));
         if(inputs.length < 3)  {
             document.getElementById("display").value = "Math Error";
         }
         numholder = '';
         document.getElementById("display").value = parser(inputs);
-        decimalbtn.addEventListener("click",buttonpressing);
+        pressed = false;
+        decimalpressed(pressed);
     }
 //if backspace is encountered
-    if(e.className == "number backspace"){
+    if(e.classList.contains("backspace")){
         if(numholder == '' && (inputs[inputs.length-1] == '+' || inputs[inputs.length-1] == '-' || inputs[inputs.length-1] == '*' || inputs[inputs.length-1] == '/')){
             inputs.pop();
         }
@@ -93,25 +106,31 @@ function buttonpressing(e){
         tempnum = numholder;
         document.getElementById("display").value = temp.substr(0, temp.length - 1);
         numholder = tempnum.substr(0,tempnum.length-1);
-        decimalbtn.addEventListener("click",buttonpressing);
     }
     //if clear is pressed, clear everything
-    if(e.className == "number clear") {
+    if(e.classList.contains("clear")) {
         document.getElementById("display").value = '';
         inputs = [];
         numholder = '';
-        decimalbtn.addEventListener("click",buttonpressing);
+        pressed = false;
+        decimalpressed(pressed);
     }
-    console.log(inputs)
 }
 
+function transform(e){
+    e.target.classList.remove('playing');
+    //this.classList.toggle('playing',e.propertyName !== 'transform');
+}
 
-calcchoices.forEach(choice => choice.addEventListener("click", e => {
-buttonpressing(e.target)
-}));
-
-window.addEventListener("keydown", function(e){
+window.addEventListener("keydown", e => {
     const key = document.querySelector(`button[data-key="${e.keyCode}"]`);
     buttonpressing(key);
-})
+    transform;
+});
 
+calcchoices.forEach(choice => choice.addEventListener("click", e => {
+    buttonpressing(e.target)
+    transform;
+    }));
+
+calcchoices.forEach(key => key.addEventListener("transitionend",transform));
